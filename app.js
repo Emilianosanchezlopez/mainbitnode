@@ -35,7 +35,11 @@ var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azu
 // Create your bot with a function to receive messages from the user
 var bot = new builder.UniversalBot(connector);
 bot.set('storage', tableStorage);
-
+var DialogLabels = {
+    Hotels: 'Hotels',
+    Flights: 'Flights',
+    Support: 'Support'
+};
 bot.dialog('/', [
     // function (session) {
     //     builder.Prompts.text(session, "Hello... What's your name?");
