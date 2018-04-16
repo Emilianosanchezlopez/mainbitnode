@@ -37,21 +37,88 @@ var bot = new builder.UniversalBot(connector);
 bot.set('storage', tableStorage);
 
 bot.dialog('/', [
+    // function (session) {
+    //     builder.Prompts.text(session, "Hello... What's your name?");
+    // },
+    // function (session, results) {
+    //     session.userData.name = results.response;
+    //     builder.Prompts.number(session, "Hi " + results.response + ", How many years have you been coding?"); 
+    // },
+    // function (session, results) {
+    //     session.userData.coding = results.response;
+    //     builder.Prompts.choice(session, "What language do you code Node using?", ["JavaScript", "CoffeeScript", "TypeScript"]);
+    // },
+    // function (session, results) {
+    //     session.userData.language = results.response.entity;
+    //     session.send("Got it... " + session.userData.name + 
+    //                 " you've been programming for " + session.userData.coding + 
+    //                 " years and use " + session.userData.language + ".");
+    // }
+    
     function (session) {
-        builder.Prompts.text(session, "Hello... What's your name?");
+        // prompt for search option
+        builder.Prompts.choice(
+            session,
+            'Are you looking for a flight or a hotel?',
+            [DialogLabels.Flights, DialogLabels.Hotels, DialogLabels.Support],
+            {
+                maxRetries: 3,
+                retryPrompt: 'Not a valid option'
+            });
+            // "Hotels|Flights|Support", { listStyle: builder.ListStyle.button });
     },
-    function (session, results) {
-        session.userData.name = results.response;
-        builder.Prompts.number(session, "Hi " + results.response + ", How many years have you been coding?"); 
-    },
-    function (session, results) {
-        session.userData.coding = results.response;
-        builder.Prompts.choice(session, "What language do you code Node using?", ["JavaScript", "CoffeeScript", "TypeScript"]);
-    },
-    function (session, results) {
-        session.userData.language = results.response.entity;
-        session.send("Got it... " + session.userData.name + 
-                    " you've been programming for " + session.userData.coding + 
-                    " years and use " + session.userData.language + ".");
+    
+    function (session, result) {
+        if (!result.response) {
+            // exhausted attemps and no selection, start over
+            session.send('Ooops! Too many attemps :( But don\'t worry, I\'m handling that exception and you can try again!');
+            return session.endDialog();
+        }
+
+        // on error, start over
+        session.on('error', function (err) {
+            session.send('Failed with message: %s', err.message);
+            session.endDialog();
+        });
+
+        // continue on proper dialog
+        var selection = result.response.entity;
+        switch (selection) {
+            case DialogLabels.Flights:
+                return session.beginDialog('flights');
+            case DialogLabels.Hotels:
+                return session.beginDialog('hotels');
+            case DialogLabels.Support:
+                return session.beginDialog('support');
+        }
     }
 ]);
+
+bot.dialog('flights', [
+    // function (session) {
+    //     session.send("You choice Flights!");
+        
+    // },
+    
+        (session)=> {
+            builder.Prompts.text(session, 'What is your name?');
+        },
+        (session, results)=> { 
+            session.endDialog(`Hello, ${results.response}`);
+        }
+    ]
+);
+bot.dialog('hotels', [
+    function (session) {
+        session.send("You choice Hotels!");
+        session.endDialog();
+    }
+]
+);
+bot.dialog('support', [
+    function (session) {
+        session.send("How can I Help you!");
+        session.endDialog();
+    }
+]
+);
