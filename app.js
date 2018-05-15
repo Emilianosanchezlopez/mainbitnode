@@ -68,7 +68,7 @@ bot.dialog('/', [
             [DialogLabels.NewUser, DialogLabels.Unlock, DialogLabels.NewPass, DialogLabels.Registry],
             {
                 maxRetries: 3,
-                retryPrompt: 'Por favor, elige una opción válida'
+                retryPrompt: 'Hola, por favor, elige una opción válida'
             });
             // "Hotels|Flights|Support", { listStyle: builder.ListStyle.button });
     },
