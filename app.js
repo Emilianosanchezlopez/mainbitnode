@@ -36,9 +36,10 @@ var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azu
 var bot = new builder.UniversalBot(connector);
 bot.set('storage', tableStorage);
 var DialogLabels = {
-    Hotels: 'Hotels',
-    Flights: 'Flights',
-    Support: 'Support'
+    NewUser: 'Registrar cuenta',
+    Unlock: 'Desbloquear Cuenta',
+    NewPass: 'Nueva Contraseña',
+    Registry: 'Registrar Equipo'
 };
 bot.dialog('/', [
     // function (session) {
@@ -63,11 +64,11 @@ bot.dialog('/', [
         // prompt for search option
         builder.Prompts.choice(
             session,
-            'Are you looking for a flight or a hotel?',
-            [DialogLabels.Flights, DialogLabels.Hotels, DialogLabels.Support],
+            'Hola en que puedo ayudarte',
+            [DialogLabels.NewUser, DialogLabels.Unlock, DialogLabels.NewPass, DialogLabels.Registry],
             {
                 maxRetries: 3,
-                retryPrompt: 'Not a valid option'
+                retryPrompt: 'Por favor, elige una opción válida'
             });
             // "Hotels|Flights|Support", { listStyle: builder.ListStyle.button });
     },
@@ -75,7 +76,7 @@ bot.dialog('/', [
     function (session, result) {
         if (!result.response) {
             // exhausted attemps and no selection, start over
-            session.send('Ooops! Too many attemps :( But don\'t worry, I\'m handling that exception and you can try again!');
+            session.send('Uuups! demasiados intentos fallidos, :( pero no te preocupes, puedes intentarlo de nuevo!');
             return session.endDialog();
         }
 
@@ -88,41 +89,58 @@ bot.dialog('/', [
         // continue on proper dialog
         var selection = result.response.entity;
         switch (selection) {
-            case DialogLabels.Flights:
-                return session.beginDialog('flights');
-            case DialogLabels.Hotels:
-                return session.beginDialog('hotels');
-            case DialogLabels.Support:
-                return session.beginDialog('support');
+            case DialogLabels.NewUser:
+                return session.beginDialog('newuser');
+            case DialogLabels.Unlock:
+                return session.beginDialog('unlock');
+            case DialogLabels.NewPass:
+                return session.beginDialog('newpass');
+            case DialogLabels.Registry:
+                return session.beginDialog('registry');
         }
     }
 ]);
-
-bot.dialog('flights', [
-    // function (session) {
-    //     session.send("You choice Flights!");
-        
-    // },
-    
-        (session)=> {
-            builder.Prompts.text(session, 'What is your name?');
-        },
-        (session, results)=> { 
-            session.endDialog(`Hello, ${results.response}`);
-        }
-    ]
-);
-bot.dialog('hotels', [
-    function (session) {
-        session.send("You choice Hotels!");
-        session.endDialog();
+bot.dialog('newuser', [
+       
+    function(session){
+        builder.Prompts.text(session, '¿Cuál es tu cuenta de correo? (ejemplo: usuario32@mainbit.com.mx)');
+    },
+    function(session, results){ 
+        session.endDialog(`Hola, la cuenta ${results.response} ha sido registrada correctamente.`);
     }
 ]
 );
-bot.dialog('support', [
-    function (session) {
-        session.send("How can I Help you!");
-        session.endDialog();
-    }
+
+bot.dialog('unlock', [
+function(session){
+    builder.Prompts.text(session, '¿Cuál es la cuenta que deseas desbloquear? (ejemplo: usuario32@mainbit.com.mx)');
+},
+function(session, results){ 
+    session.endDialog(`Hola, la cuenta ${results.response} ha sido desbloqueada correctamente.`);
+}
+]
+);
+
+bot.dialog('newpass', [
+function(session) {
+    builder.Prompts.text(session, '¿Cuál es la cuenta de correo? (ejemplo: usuario32@mainbit.com.mx)');
+},
+function(session, results){ 
+    session.endDialog(`Hola, la nueva contraseña para la cuenta ${results.response} es: ZxU81LmT`);
+}
+]
+);
+
+bot.dialog('registry', [
+function(session){
+    builder.Prompts.choice(
+        session,
+        'Hola en que puedo ayudarte',
+        [DialogLabels.NewUser, DialogLabels.Unlock, DialogLabels.NewPass, DialogLabels.Registry],
+        {
+            maxRetries: 3,
+            retryPrompt: 'Por favor, elige una opción válida'
+        });
+}
 ]
 );
